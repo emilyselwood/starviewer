@@ -27,47 +27,6 @@ const maxY = 1.1216725295000006e+10 / scale;
 const minZ = -5.482463379824468e+09 / scale;
 const maxZ = 4.381383003697839e+09 / scale;
 
-// color pallets for pride flags.
-const Rainbow = [
-    [231 / 255, 0, 0],
-    [255 / 255, 140 / 255, 0],
-    [255 / 255, 239 / 255, 0],
-    [0, 129 / 255, 31 / 255],
-    [0, 68 / 255, 255 / 255]
-];
-
-const Trans = [
-    [85 / 255, 205 / 255, 252 / 255],
-    [247 / 255, 168 / 255, 184 / 255],
-    [255 / 255, 255 / 255, 255 / 255],
-    [247 / 255, 168 / 255, 184 / 255],
-    [85 / 255, 205 / 255, 252 / 255]
-];
-
-// TODO: check that this is correct
-const Bi = [
-    [217 / 255, 0, 111 / 255],
-    [217 / 255, 0, 111 / 255],
-    [116 / 255, 77 / 255, 152 / 255],
-    [0, 51 / 255, 171 / 255],
-    [0, 51 / 255, 171 / 255]
-];
-
-// TODO: Lesbian
-// TODO: Pan
-
-// basic color pallet for asteroids.
-const White = [[1, 1, 1]];
-
-const colourmaps = [
-    Rainbow,
-    Trans,
-    Bi,
-    White
-];
-// pick a random colour map for the asteroids
-let colourMap = White;
-
 init();
 
 function init() {
@@ -122,7 +81,7 @@ function init() {
     sprite = new THREE.TextureLoader().load( 'img/particle2.png' );
 
     for (let i = 0; i < 1; i++) {
-        loadAsteroidBatch(i);
+        loadDataBatch(i);
     }
 
 
@@ -136,15 +95,7 @@ function init() {
     animate();
 }
 
-function loadMajorPlanet(name, color) {
-    loadData("data/" +name+ ".csv", 
-    new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } ),
-    color,
-    THREE.Line,
-    false);
-}
-
-function loadAsteroidBatch(batch) {
+function loadDataBatch(batch) {
     loadData(
         "data/data-" + batch + ".csv",
         new THREE.PointsMaterial( {
@@ -159,26 +110,12 @@ function loadAsteroidBatch(batch) {
             lights: false,
             sizeAttenuation: false
         } ),
-        colourMap,
         THREE.Points,
         true
     );
 }
 
-function createSun() {
-    const positions = [0, 0, 0];
-    const colors = [1,1,0];
-
-    const geometry = new THREE.BufferGeometry();
-    geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-    geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-    geometry.computeBoundingSphere();
-    
-    const points = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 10, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } ));
-    scene.add( points );
-}
-
-function loadData(name, mat, color, T, raytarget) {
+function loadData(name, mat, T, raytarget) {
     let loader = new THREE.FileLoader();
     
     //load a text file and output the result to the console
@@ -229,25 +166,11 @@ function createGeom(data, color) {
     for (let i = 0; i < n; i++) {
         if (lines[i] !== "") {
             let parts = lines[i].split(",");
-            let id = "";
-            let x = 0.0;
-            let y = 0.0;
-            let z = 0.0;
-            x = parseFloat(parts[0]);
-            y = parseFloat(parts[1]);
-            z = parseFloat(parts[2]);
-            id = parts[3];
-            // if (parts.length === 4) {
-            //     id = parts[4];
-               
-            // } else if (parts.length === 3) {
-            //     x = parseFloat(parts[0]);
-            //     y = parseFloat(parts[1]);
-            //     z = parseFloat(parts[2]);
-            // } else {
-            //     console.log("could not decode line " + i);
-            //     continue;
-            // }
+            
+            let x = parseFloat(parts[0]);
+            let y = parseFloat(parts[1]);
+            let z = parseFloat(parts[2]);
+            let id = parts[3];
             
             if (isNaN(x) || isNaN(y) || isNaN(z)) {
                 console.log("could not decode " + lines[i] + " line " + i);
@@ -275,53 +198,13 @@ function raycastCheck() {
     const intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
     
     if ( intersection !== null) {
-        sphere.position.copy( intersection.point );
-        sphere.scale.set( 1, 1, 1 );
 
         const objectID = intersection.object.userData.IDS[intersection.index];
         console.log("clicked on " + objectID );
         const linkTag = document.getElementById("asteroidLink");
         linkTag.innerText = objectID;
         linkTag.href = "https://www.minorplanetcenter.net/db_search/show_object?utf8=✓&object_id=" + objectID;
-        if (server) {
-            const loader = new THREE.FileLoader();
-            loader.load("/obj/" + objectID.replace(/ /g, '+'),
-                function (data) {
-                    if (orbitLine !== null) {
-                        scene.remove(orbitLine)
-                    }
-
-                    const response = JSON.parse(data);
-
-                    let positions = [];
-                    let colors = [];
-                    for (let i = 0; i < response.Orbit.length; i++) {
-                        positions.push(response.Orbit[i].X / scale, response.Orbit[i].Z / scale, response.Orbit[i].Y / scale);
-                        colors.push(0, 0, 255);
-                    }
-
-                    positions.push(positions[0], positions[1], positions[2]);
-                    colors.push(0, 0, 255);
-
-                    const geometry = new THREE.BufferGeometry();
-                    geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-                    geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-                    geometry.computeBoundingSphere();
-
-                    orbitLine = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: 0x77FF77, linewidth: 10}));
-                    scene.add(orbitLine);
-                    console.log("loaded " + objectID);
-                },
-                function(xhr) {
-
-                },
-                function(error) {
-                    // If we cant talk to the server for some reason we won't try again.
-                    // It is likely we are running in a static environment.
-                    server = false;
-                }
-            )
-        }
+        
     }
 }
 
