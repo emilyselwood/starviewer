@@ -128,6 +128,8 @@ function loadData(name, mat, T, raytarget) {
             const positions = bits[0];
             const colors = bits[1];
             const ids = bits[2];
+            const temps = bits[3];
+            const sizes = bits[4];
 
             const geometry = new THREE.BufferGeometry();
             geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
@@ -136,7 +138,7 @@ function loadData(name, mat, T, raytarget) {
 
             const points = new T( geometry, mat);
             if (ids.length > 0) {
-                points.userData = {IDS: ids};
+                points.userData = {IDS: ids, Temps: temps, Sizes: sizes};
             }
             if(raytarget){
                 pointsSet.push(points);
@@ -161,6 +163,8 @@ function createGeom(data) {
     let positions = [];
     let colors = [];
     let ids = [];
+    let temps = [];
+    let sizes = [];
     const lines = data.split(/\r?\n/);
     const n = lines.length;
     for (let i = 0; i < n; i++) {
@@ -171,7 +175,8 @@ function createGeom(data) {
             let y = parseFloat(parts[1]);
             let z = parseFloat(parts[2]);
             let id = parts[3];
-            let temp = parseFloat(parts[4]);
+            let size = parseFloat(parts[4]);
+            let temp = parseFloat(parts[5]);
 
             if (isNaN(x) || isNaN(y) || isNaN(z)) {
                 console.log("could not decode " + lines[i] + " line " + i);
@@ -182,15 +187,17 @@ function createGeom(data) {
             y = y / scale;
             z = z / scale;
             positions.push( x, z, y ); // swap z and y around so we get more intuitive controls
+
             let c = mapToColour(x, y, z, temp);   
-                colors.push(c[0], c[1], c[2]);
-            if (id !== "") {
-                ids.push(id);
-            }
+            colors.push(c[0], c[1], c[2]);
+
+            ids.push(id);
+            temps.push(temp);
+            sizes.push(size);
 
         }
     }
-    return [positions, colors, ids];
+    return [positions, colors, ids, temps, sizes];
 }
 
 function raycastCheck() {
@@ -200,11 +207,14 @@ function raycastCheck() {
     const intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
     
     if ( intersection !== null) {
-        console.log(intersections);
         const objectID = intersection.object.userData.IDS[intersection.index];
+        const temp = intersection.object.userData.Temps[intersection.index];
+        const size = intersection.object.userData.Sizes[intersection.index];
+
         console.log("clicked on " + objectID );
-        const linkTag = document.getElementById("asteroidLink");
-        linkTag.innerText = objectID;
+        
+        const linkTag = document.getElementById("clickLabel");
+        linkTag.innerHTML = objectID + "<br>Effective Temp: " + temp + "k<br>Size: " + size;
     }
 }
 
