@@ -441,13 +441,13 @@ function randomNumber(max) {
 
 function mapToColour(x, y, z, temp) {
 
-    rs = 1;
-    gs = 0;
-    bs = 0;
+    const rs = 1;
+    const gs = 0;
+    const bs = 0;
 
-    re = 0;
-    ge = 0;
-    bs = 1;
+    const re = 0;
+    const ge = 0;
+    const be = 1;
 
     const minTemp = 0;
     const maxTemp = 25200;
