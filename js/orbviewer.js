@@ -195,7 +195,8 @@ function createGeom(data) {
 
 function raycastCheck() {
     raycaster.setFromCamera( mouse, camera );
-    const intersections = raycaster.intersectObjects(pointsSet);
+    let intersections = raycaster.intersectObjects(pointsSet);
+    intersections.sort((a,b) => (a.distanceToRay > b.distanceToRay ? 1: -1))
     const intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
     
     if ( intersection !== null) {
