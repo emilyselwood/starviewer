@@ -199,7 +199,7 @@ function raycastCheck() {
     const intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
     
     if ( intersection !== null) {
-
+        console.log(intersections);
         const objectID = intersection.object.userData.IDS[intersection.index];
         console.log("clicked on " + objectID );
         const linkTag = document.getElementById("asteroidLink");
