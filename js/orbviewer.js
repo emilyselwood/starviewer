@@ -124,7 +124,7 @@ function loadData(name, mat, T, raytarget) {
         name,
         // onLoad callback
         function ( data ) {
-            const bits = createGeom(data, color);
+            const bits = createGeom(data);
             const positions = bits[0];
             const colors = bits[1];
             const ids = bits[2];
@@ -157,7 +157,7 @@ function loadData(name, mat, T, raytarget) {
     );
 }
 
-function createGeom(data, color) {
+function createGeom(data) {
     let positions = [];
     let colors = [];
     let ids = [];
@@ -171,6 +171,7 @@ function createGeom(data, color) {
             let y = parseFloat(parts[1]);
             let z = parseFloat(parts[2]);
             let id = parts[3];
+            let temp = parseFloat(parts[4]);
             
             if (isNaN(x) || isNaN(y) || isNaN(z)) {
                 console.log("could not decode " + lines[i] + " line " + i);
@@ -181,7 +182,7 @@ function createGeom(data, color) {
             y = y / scale;
             z = z / scale;
             positions.push( x, z, y ); // swap z and y around so we get more intuitive controls
-            let c = mapToColour(x, y, z, parseFloat(parts[4]));   
+            let c = mapToColour(x, y, z, temp);   
                 colors.push(c[0], c[1], c[2]);
             if (id !== "") {
                 ids.push(id);
