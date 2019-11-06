@@ -66,24 +66,13 @@ const colourmaps = [
     White
 ];
 // pick a random colour map for the asteroids
-let colourMap = null;
+let colourMap = White;
 
 init();
 
 function init() {
 
-    // pick a colour pallet for the asteroids.
-    const url = new URL(window.location.href);
-    if (url.searchParams.has('f')) {
-        const f = parseInt(url.searchParams.get('f'), 10);
-        if(!Number.isNaN(f) && f >= 0 && f < colourmaps.length) {
-            colourMap = colourmaps[f];
-        }
-    }
-    if (colourMap === null) {
-        colourMap = colourmaps[Math.floor(Math.random() * colourmaps.length)];
-    }
-
+    
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
     container = document.getElementById( 'container' );
     container.addEventListener('click', onCanvasClick, false);
@@ -135,26 +124,14 @@ function init() {
     for (let i = 0; i < 1; i++) {
         loadAsteroidBatch(i);
     }
-    /*
-    const majorPlanets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"];
-    const colours = [new THREE.Color(1,1,0), new THREE.Color(0,1,0), new THREE.Color(0,0,1),
-        new THREE.Color(1,0,0), new THREE.Color(1,0,1), new THREE.Color(0,1,1),
-        new THREE.Color(0,1,0), new THREE.Color(1,0,0)];
 
-    for (let i = 0; i < majorPlanets.length; i++) {
-        loadMajorPlanet(majorPlanets[i], colours[i])
-    }
-    
-
-    createSun();
-    */
 
     // Create ray cast target sphere:
-    sphere = new THREE.Mesh(
+    /*sphere = new THREE.Mesh(
         new THREE.SphereBufferGeometry( 0.1, 12, 12 ),
         new THREE.MeshBasicMaterial( { color: 0xff0000 } )
     );
-    scene.add( sphere );
+    scene.add( sphere );*/
 
     animate();
 }
@@ -259,7 +236,7 @@ function createGeom(data, color) {
             x = parseFloat(parts[0]);
             y = parseFloat(parts[1]);
             z = parseFloat(parts[2]);
-
+            id = parts[3];
             // if (parts.length === 4) {
             //     id = parts[4];
                
@@ -281,12 +258,8 @@ function createGeom(data, color) {
             y = y / scale;
             z = z / scale;
             positions.push( x, z, y ); // swap z and y around so we get more intuitive controls
-            if (Array.isArray(color)) { // if our color is an array we probably need to pick one of the entries.
-                let c = mapToColour(color, x, y, z);
+            let c = mapToColour(x, y, z, parseFloat(parts[4]));   
                 colors.push(c[0], c[1], c[2]);
-            } else { // otherwise it should be a three.Color object.
-                colors.push(color.r, color.g, color.b);
-            }
             if (id !== "") {
                 ids.push(id);
             }
@@ -465,11 +438,25 @@ function randomNumber(max) {
     return Math.floor(Math.random() * max)
 }
 
-function mapToColour(map, x, y, z) {
-    let bucket = Math.round(((x - minX) / (maxX - minX)) * (map.length-1));
-    if (bucket < 0 || bucket >= map.length) {
-        console.log("could not find bucket for x: " + x + " got bucket " + bucket);
-        return map[0]
-    }
-    return map[bucket];
+
+function mapToColour(x, y, z, temp) {
+
+    rs = 1;
+    gs = 0;
+    bs = 0;
+
+    re = 0;
+    ge = 0;
+    bs = 1;
+
+    const minTemp = 0;
+    const maxTemp = 25200;
+
+    let t = temp / (maxTemp - minTemp);
+
+    let r = (1-t) * rs + t * re + 0.5;
+    let g = (1-t) * gs + t * ge + 0.5;
+    let b = (1-t) * bs + t * be + 0.5;
+
+    return [r, g, b]
 }
