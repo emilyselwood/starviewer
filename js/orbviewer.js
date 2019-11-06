@@ -453,7 +453,7 @@ function pickPosition() {
     let lon = randomNumber(360) - 180;
 
     // convert these two angles to a point on a sphere somewhere near the edge of the solar system.
-    const R = 1000;
+    const R = 100;
     return {
         x: R * Math.cos(lat) * Math.cos(lon),
         y: R * Math.cos(lat) * Math.sin(lon),
