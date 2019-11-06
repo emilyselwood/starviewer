@@ -172,7 +172,7 @@ function createGeom(data) {
             let z = parseFloat(parts[2]);
             let id = parts[3];
             let temp = parseFloat(parts[4]);
-            
+
             if (isNaN(x) || isNaN(y) || isNaN(z)) {
                 console.log("could not decode " + lines[i] + " line " + i);
                 continue;
@@ -195,7 +195,7 @@ function createGeom(data) {
 
 function raycastCheck() {
     raycaster.setFromCamera( mouse, camera );
-    const intersections = raycaster.intersectObjects(pointsSet );
+    const intersections = raycaster.intersectObjects(pointsSet);
     const intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
     
     if ( intersection !== null) {
@@ -204,8 +204,6 @@ function raycastCheck() {
         console.log("clicked on " + objectID );
         const linkTag = document.getElementById("asteroidLink");
         linkTag.innerText = objectID;
-        linkTag.href = "https://www.minorplanetcenter.net/db_search/show_object?utf8=✓&object_id=" + objectID;
-        
     }
 }
 
