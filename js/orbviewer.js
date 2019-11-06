@@ -212,9 +212,9 @@ function raycastCheck() {
         const size = intersection.object.userData.Sizes[intersection.index];
 
         console.log("clicked on " + objectID );
-        
+
         const linkTag = document.getElementById("clickLabel");
-        linkTag.innerHTML = objectID + "<br>Effective Temp: " + temp + "k<br>Size: " + size;
+        linkTag.innerHTML = objectID + "<br>Effective Temp: " + temp + "k<br>Size: " + size + " sun radius'";
     }
 }
 
