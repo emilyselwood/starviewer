@@ -31,14 +31,8 @@ init();
 
 function init() {
 
-    
-    document.addEventListener( 'mousemove', onDocumentMouseMove, false );
     container = document.getElementById( 'container' );
-    container.addEventListener('click', onCanvasClick, false);
-    container.addEventListener("mousedown", function(){
-        dragFlag = 0;
-    }, false);
-
+    
     renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
 
     renderer.vr.enabled = true;
@@ -51,11 +45,11 @@ function init() {
 
     stats = new Stats();
     container.appendChild( stats.dom );
-
+/*
     let vrButton = WEBVR.createButton(renderer);
     if (vrButton) {
         document.body.appendChild(vrButton);
-    }
+    }*/
 
     camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 3, 100000 );
     camera.position.z = 60;
@@ -91,6 +85,13 @@ function init() {
         new THREE.MeshBasicMaterial( { color: 0xff0000 } )
     );
     scene.add( sphere );*/
+
+    document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+    container.addEventListener('click', onCanvasClick, false);
+    container.addEventListener("mousedown", function(){
+        dragFlag = 0;
+    }, false);
+
 
     animate();
 }
@@ -257,16 +258,16 @@ function animate(time) {
     requestAnimationFrame(animate);
     resize();
     // if vr is enabled three will handle the controls for us.
-    if (renderer.vr.isPresenting()) {
-        renderer.vr.getCamera = renderer.vr._origGetCamera;
-    } else {
+    //if (renderer.vr.isPresenting()) {
+        //renderer.vr.getCamera = renderer.vr._origGetCamera;
+    //} else {
         if (controlState === 0) {
             controls.update();
         } else {
             tween.update(time);
         }
         renderer.vr.getCamera = () => camera;
-    }
+    //}
 
     stats.update();
     render();
